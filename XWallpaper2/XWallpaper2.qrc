@@ -1,4 +1,6 @@
 <RCC>
-    <qresource prefix="XWallpaper2">
+    <qresource prefix="/XWallpaper2">
+        <file>res/XWallPaper2.ico</file>
+        <file>res/XXY.png</file>
     </qresource>
 </RCC>
