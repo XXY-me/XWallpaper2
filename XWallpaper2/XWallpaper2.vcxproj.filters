@@ -27,9 +27,6 @@
     <QtRcc Include="XWallpaper2.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
-    <QtUic Include="XWallpaper2.ui">
-      <Filter>Resource Files</Filter>
-    </QtUic>
     <QtMoc Include="XWallpaper2.h">
       <Filter>Header Files</Filter>
     </QtMoc>
@@ -39,6 +36,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XPlayListItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,5 +56,18 @@
     <Image Include="res\XWallPaper2.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="XPlayListItem.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="XPlayListItem.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="XWallpaper2.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
   </ItemGroup>
 </Project>

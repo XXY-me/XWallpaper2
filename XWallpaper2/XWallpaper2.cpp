@@ -5,6 +5,11 @@
 //#include <QWindow>
 #include <qt_windows.h>
 #include <QLabel>
+#include <QWebEngineSettings>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QPushButton>
+#include "XPlayListItem.h"
 
 XWallpaper2::XWallpaper2(QWidget *parent)
     : QMainWindow(parent)
@@ -26,8 +31,13 @@ XWallpaper2::XWallpaper2(QWidget *parent)
 	m_TrayIcon->setToolTip(QString::fromLocal8Bit("双击显示窗口，右键显示菜单。"));
 	m_TrayIcon->setContextMenu(m_TrayMenu);
 	m_TrayIcon->show();
-	m_TrayIcon->showMessage(QString("XWallpaper2"), QString("XWallpaper2 Started!"));
+	//m_TrayIcon->showMessage(QString("XWallpaper2"), QString("XWallpaper2 Started!"));
 	connect(m_TrayIcon, &QSystemTrayIcon::activated, this, &XWallpaper2::onTrayIconActivated);
+
+	//按钮操作
+	connect(ui.btnPrev, &QPushButton::clicked, this, &XWallpaper2::prev);
+	connect(ui.btnNext, &QPushButton::clicked, this, &XWallpaper2::next);
+	connect(ui.btnStart, &QPushButton::clicked, this, &XWallpaper2::stop);
 }
 
 void XWallpaper2::setDeskopWnd(HWND h)
@@ -54,21 +64,37 @@ void XWallpaper2::setDeskopWnd(HWND h)
 
 		//创建WebView窗口用来显示
 		m_WebView = new QWebEngineView();
+		connect(m_WebView, &QWebEngineView::loadFinished, this, &XWallpaper2::pageLoadFinished);
 		m_WebView->setWindowFlags(Qt::FramelessWindowHint);
 		SetParent((HWND)m_WebView->winId(), m_DesktopWnd);
 		m_WebView->setFixedSize({r.right,r.bottom});
 		m_WebView->move(0,0);
-		m_WebView->setUrl(QUrl("https://www.51qianduan.com/article/view/13538.html"));
-		m_WebView->show();
+		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls,true);
+		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls,true);
+		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::LocalStorageEnabled,true);
+		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);		
+		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
+		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::JavascriptCanOpenWindows, true);
+		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::JavascriptCanAccessClipboard, true);
+		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::SpatialNavigationEnabled, true);
+		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::LinksIncludedInFocusChain, true);
+		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::AutoLoadImages, true);
+
+		//m_WebView->setUrl(QUrl::fromLocalFile(QString::fromLocal8Bit("D:/page/cloud1111/纯css3云彩动画效果/index.html")));
+		//m_WebView->show();
+		next();
 	}
 }
 
 void XWallpaper2::stop()
 {
-	m_TrayIcon->showMessage(QString("XWallpaper2"), QString("XWallpaper2 stop!"));
 	if (m_WebView)
 	{
-		if (m_WebView->isHidden())
+		if (m_currentIndex == -1)
+		{
+			next();
+		}
+		else if (m_WebView->isHidden())
 		{
 			m_PaperWidget->hide();
 			m_WebView->show();
@@ -85,20 +111,103 @@ void XWallpaper2::stop()
 
 void XWallpaper2::next()
 {
+	if (m_PlayList.isEmpty() || m_WebView == nullptr)
+	{
+		return;
+	}
+	m_currentIndex++;
+	if (m_currentIndex >= m_PlayList.count())
+	{
+		m_currentIndex = 0;
+	}
+	QString str = m_PlayList[m_currentIndex];
+	if (str.startsWith("http"))
+	{
+		m_WebView->load(QUrl(str));
+	}
+	else
+	{
+		if (str.endsWith("html"))
+		{
+			m_WebView->load(QUrl::fromLocalFile(str));
+		}
+	}
+	m_WebView->show();
 }
 
 void XWallpaper2::prev()
 {
+	if (m_PlayList.isEmpty() || m_WebView == nullptr)
+	{
+		return;
+	}
+	m_currentIndex--;
+	if (m_currentIndex < 0)
+	{
+		m_currentIndex = m_PlayList.count() - 1;
+	}
+	QString str = m_PlayList[m_currentIndex];
+	if (str.startsWith("http"))
+	{
+		m_WebView->load(QUrl(str));
+	}
+	else
+	{
+		if (str.endsWith("html"))
+		{
+			m_WebView->load(QUrl::fromLocalFile(str));
+		}
+	}
+	m_WebView->show();
 }
 
 void XWallpaper2::flush()
 {
+	m_WebView->reload();
 }
 
 void XWallpaper2::close()
 {
 	m_CloseForExit = true;
 	__super::close();
+}
+
+void XWallpaper2::pageLoadFinished(bool bok)
+{
+	if (!bok)
+	{
+		next();
+	}
+}
+
+void XWallpaper2::on_btnAddFile_clicked()
+{
+	QString str = QFileDialog::getOpenFileName(this,QString::fromLocal8Bit("选择文件"),"",QString("Html File (*.html)"));
+	if (str.isEmpty())
+	{
+		return;
+	}
+	if (m_PlayList.contains(str))
+	{
+		QMessageBox::information(this, QString("XWallpaper2"), QString::fromLocal8Bit("列表中已存在该文件！"));
+		return;
+	}
+	m_PlayList.append(str);
+}
+
+void XWallpaper2::on_btnAddUrl_clicked()
+{
+	QString str = ui.lineEditURL->text();
+	if (str.isEmpty() )
+	{
+		return;
+	}
+	if (m_PlayList.contains(str))
+	{
+		QMessageBox::information(this, QString("XWallpaper2"), QString::fromLocal8Bit("列表中已存在该文件！"));
+		return;
+	}
+	m_PlayList.append(str);
 }
 
 void XWallpaper2::closeEvent(QCloseEvent * event)
@@ -119,6 +228,41 @@ void XWallpaper2::closeEvent(QCloseEvent * event)
 			m_PaperWidget->close();
 		}
 	}
+}
+
+void XWallpaper2::loadPlayList()
+{
+	m_PlayList.clear();
+	QFile f("./list.xd");
+	if (f.open(QFile::ReadOnly))
+	{
+		QString str = f.readLine();
+		while (!str.isEmpty())
+		{
+			m_PlayList.append(str);
+			str = f.readLine();
+		}
+		f.close();
+	}
+}
+
+void XWallpaper2::savePlayList()
+{
+	QFile f("./list.xd");
+	if (f.open(QFile::WriteOnly))
+	{
+		for each (auto var in m_PlayList)
+		{
+			f.write(var.toUtf8());
+			f.write("\r\n");
+		}
+		f.close();
+	}
+}
+
+void XWallpaper2::showPlayList()
+{
+
 }
 
 void XWallpaper2::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason)

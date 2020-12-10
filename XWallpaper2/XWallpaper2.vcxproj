@@ -87,13 +87,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <QtRcc Include="XWallpaper2.qrc" />
+    <QtUic Include="XPlayListItem.ui" />
     <QtUic Include="XWallpaper2.ui" />
     <QtMoc Include="XWallpaper2.h" />
+    <ClCompile Include="XPlayListItem.cpp" />
     <ClCompile Include="XWallpaper2.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
+    <QtMoc Include="XPlayListItem.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="XWallpaper2.rc" />

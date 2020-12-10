@@ -20,8 +20,15 @@ protected slots:
 	void prev();
 	void flush();
 	void close();
+	void pageLoadFinished(bool bok);
+	void on_btnAddFile_clicked();
+	void on_btnAddUrl_clicked();
 protected:
 	void closeEvent(QCloseEvent *event);
+private:
+	void loadPlayList();
+	void savePlayList();
+	void showPlayList();
 private:
     Ui::XWallpaper2Class ui;
 	HWND m_DesktopWnd = nullptr;
@@ -30,4 +37,6 @@ private:
 	bool m_CloseForExit = false;
 	QWebEngineView *m_WebView = nullptr;
 	QWidget *m_PaperWidget = nullptr;
+	QList<QString> m_PlayList;
+	int m_currentIndex = -1;
 };
