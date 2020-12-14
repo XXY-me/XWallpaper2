@@ -4,6 +4,7 @@
 #include "ui_XWallpaper2.h"
 #include <QSystemTrayIcon>
 #include <QWebEngineView>
+#include "XPlayListItem.h"
 
 class XWallpaper2 : public QMainWindow
 {
@@ -23,8 +24,11 @@ protected slots:
 	void pageLoadFinished(bool bok);
 	void on_btnAddFile_clicked();
 	void on_btnAddUrl_clicked();
+	void on_PlayItem();
+	void on_DeleteItem();
 protected:
 	void closeEvent(QCloseEvent *event);
+	void showEvent(QShowEvent* se);
 private:
 	void loadPlayList();
 	void savePlayList();
@@ -37,6 +41,7 @@ private:
 	bool m_CloseForExit = false;
 	QWebEngineView *m_WebView = nullptr;
 	QWidget *m_PaperWidget = nullptr;
-	QList<QString> m_PlayList;
+	QStringList m_PlayList;
 	int m_currentIndex = -1;
+	QList<XPlayListItem*> m_ListItems;
 };

@@ -30,15 +30,18 @@
     <QtMoc Include="XWallpaper2.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <ClCompile Include="XWallpaper2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="XPlayListItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XWallpaper2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XItemSetting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -61,12 +64,18 @@
     <QtMoc Include="XPlayListItem.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="XItemSetting.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="XPlayListItem.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="XWallpaper2.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="XItemSetting.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

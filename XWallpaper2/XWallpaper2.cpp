@@ -9,32 +9,32 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPushButton>
-#include "XPlayListItem.h"
+#include <QMenu>
 
 XWallpaper2::XWallpaper2(QWidget *parent)
-    : QMainWindow(parent)
+	: QMainWindow(parent)
 {
-    ui.setupUi(this);
+	ui.setupUi(this);
 
 	m_TrayMenu = new QMenu(this);
 
-	m_TrayMenu->addAction(QString::fromLocal8Bit("Í£Ö¹"), this, &XWallpaper2::stop);
-	m_TrayMenu->addAction(QString::fromLocal8Bit("ÏÂÒ»¸ö"), this, &XWallpaper2::next);
-	m_TrayMenu->addAction(QString::fromLocal8Bit("ÉÏÒ»¸ö"), this, &XWallpaper2::prev);
-	m_TrayMenu->addAction(QString::fromLocal8Bit("Ë¢ÐÂ"), this, &XWallpaper2::flush);
-	m_TrayMenu->addAction(QString::fromLocal8Bit("ÏÔÊ¾Ö÷´°¿Ú"), this, &XWallpaper2::showNormal);
-	m_TrayMenu->addAction(QString::fromLocal8Bit("ÍË³ö"), this, &XWallpaper2::close);
+	m_TrayMenu->addAction(QIcon(":/XWallpaper2/res/start.png"), QString("å¼€å§‹"), this, &XWallpaper2::stop);
+	m_TrayMenu->addAction(QIcon(":/XWallpaper2/res/next.png"), QString("ä¸‹ä¸€ä¸ª"), this, &XWallpaper2::next);
+	m_TrayMenu->addAction(QIcon(":/XWallpaper2/res/prev.png"), QString("ä¸Šä¸€ä¸ª"), this, &XWallpaper2::prev);
+	m_TrayMenu->addAction(QIcon(":/XWallpaper2/res/flush.png"), QString("åˆ·æ–°"), this, &XWallpaper2::flush);
+	m_TrayMenu->addAction(QString("æ˜¾ç¤ºä¸»çª—å£"), this, &XWallpaper2::showNormal);
+	m_TrayMenu->addAction(QString("é€€å‡º"), this, &XWallpaper2::close);
 
-	//´´½¨ÍÐÅÌÍ¼±ê
+	//åˆ›å»ºæ‰˜ç›˜å›¾æ ‡
 	m_TrayIcon = new QSystemTrayIcon(this);
 	m_TrayIcon->setIcon(QIcon(":/XWallpaper2/res/XXY.png"));
-	m_TrayIcon->setToolTip(QString::fromLocal8Bit("Ë«»÷ÏÔÊ¾´°¿Ú£¬ÓÒ¼üÏÔÊ¾²Ëµ¥¡£"));
+	m_TrayIcon->setToolTip(QString("åŒå‡»æ˜¾ç¤ºçª—å£ï¼Œå³é”®æ˜¾ç¤ºèœå•ã€‚"));
 	m_TrayIcon->setContextMenu(m_TrayMenu);
 	m_TrayIcon->show();
 	//m_TrayIcon->showMessage(QString("XWallpaper2"), QString("XWallpaper2 Started!"));
 	connect(m_TrayIcon, &QSystemTrayIcon::activated, this, &XWallpaper2::onTrayIconActivated);
 
-	//°´Å¥²Ù×÷
+	//æŒ‰é’®æ“ä½œ
 	connect(ui.btnPrev, &QPushButton::clicked, this, &XWallpaper2::prev);
 	connect(ui.btnNext, &QPushButton::clicked, this, &XWallpaper2::next);
 	connect(ui.btnStart, &QPushButton::clicked, this, &XWallpaper2::stop);
@@ -45,12 +45,12 @@ void XWallpaper2::setDeskopWnd(HWND h)
 	m_DesktopWnd = h;
 	if (m_DesktopWnd != nullptr)
 	{
-		//»ñÈ¡´°¿Ú´óÐ¡
+		//èŽ·å–çª—å£å¤§å°
 		RECT r;
-		GetWindowRect(m_DesktopWnd,&r);
-		//ÏÈ±£´æÒ»·Ý×ÀÃæ±³¾°µÄ¸±±¾
+		GetWindowRect(m_DesktopWnd, &r);
+		//å…ˆä¿å­˜ä¸€ä»½æ¡Œé¢èƒŒæ™¯çš„å‰¯æœ¬
 		QPixmap pix = QPixmap::grabWindow((WId)m_DesktopWnd);
-		//´´½¨Ò»¸ö´°¿ÚÀ´±£´æÕâ¸ö×ÀÃæ¸±±¾£¬µ±Í£Ö¹²¥·ÅµÄÊ±ºòÏÔÊ¾´Ë´°¿Ú
+		//åˆ›å»ºä¸€ä¸ªçª—å£æ¥ä¿å­˜è¿™ä¸ªæ¡Œé¢å‰¯æœ¬ï¼Œå½“åœæ­¢æ’­æ”¾çš„æ—¶å€™æ˜¾ç¤ºæ­¤çª—å£
 		m_PaperWidget = new QWidget();
 		m_PaperWidget->setWindowFlags(Qt::FramelessWindowHint);
 		m_PaperWidget->setFixedSize({ r.right,r.bottom });
@@ -62,13 +62,13 @@ void XWallpaper2::setDeskopWnd(HWND h)
 		la->show();
 		SetParent((HWND)m_PaperWidget->winId(), m_DesktopWnd);
 
-		//´´½¨WebView´°¿ÚÓÃÀ´ÏÔÊ¾
+		//åˆ›å»ºWebViewçª—å£ç”¨æ¥æ˜¾ç¤º
 		m_WebView = new QWebEngineView();
 		connect(m_WebView, &QWebEngineView::loadFinished, this, &XWallpaper2::pageLoadFinished);
 		m_WebView->setWindowFlags(Qt::FramelessWindowHint);
 		SetParent((HWND)m_WebView->winId(), m_DesktopWnd);
-		m_WebView->setFixedSize({r.right,r.bottom});
-		m_WebView->move(0,0);
+		m_WebView->setFixedSize({ r.right,r.bottom });
+		m_WebView->move(0, 0);
 		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls,true);
 		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls,true);
 		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::LocalStorageEnabled,true);
@@ -79,8 +79,7 @@ void XWallpaper2::setDeskopWnd(HWND h)
 		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::SpatialNavigationEnabled, true);
 		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::LinksIncludedInFocusChain, true);
 		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::AutoLoadImages, true);
-
-		//m_WebView->setUrl(QUrl::fromLocalFile(QString::fromLocal8Bit("D:/page/cloud1111/´¿css3ÔÆ²Ê¶¯»­Ð§¹û/index.html")));
+		//m_WebView->setUrl(QUrl::fromLocalFile(QString::fromLocal8Bit("D:/page/cloud1111/çº¯css3äº‘å½©åŠ¨ç”»æ•ˆæžœ/index.html")));
 		//m_WebView->show();
 		next();
 	}
@@ -98,13 +97,17 @@ void XWallpaper2::stop()
 		{
 			m_PaperWidget->hide();
 			m_WebView->show();
-			m_TrayMenu->actions().first()->setText(QString::fromLocal8Bit("Í£Ö¹"));
+			m_TrayMenu->actions().first()->setText(QString("åœæ­¢"));
+			m_TrayMenu->actions().first()->setIcon(QIcon(":/XWallpaper2/res/stop.png"));
+			ui.btnStart->setIcon(QIcon(":/XWallpaper2/res/stop.png"));
 		}
 		else
 		{
 			m_WebView->hide();
 			m_PaperWidget->show();
-			m_TrayMenu->actions().first()->setText(QString::fromLocal8Bit("¿ªÊ¼"));
+			m_TrayMenu->actions().first()->setText(QString("å¼€å§‹"));
+			m_TrayMenu->actions().first()->setIcon(QIcon(":/XWallpaper2/res/start.png"));
+			ui.btnStart->setIcon(QIcon(":/XWallpaper2/res/start.png"));
 		}
 	}
 }
@@ -113,6 +116,13 @@ void XWallpaper2::next()
 {
 	if (m_PlayList.isEmpty() || m_WebView == nullptr)
 	{
+		if (m_PlayList.isEmpty())
+		{
+			m_WebView->hide();
+			m_TrayMenu->actions().first()->setText(QString("å¼€å§‹"));
+			m_TrayMenu->actions().first()->setIcon(QIcon(":/XWallpaper2/res/start.png"));
+			ui.btnStart->setIcon(QIcon(":/XWallpaper2/res/start.png"));
+		}
 		return;
 	}
 	m_currentIndex++;
@@ -133,6 +143,9 @@ void XWallpaper2::next()
 		}
 	}
 	m_WebView->show();
+	m_TrayMenu->actions().first()->setText(QString("åœæ­¢"));
+	m_TrayMenu->actions().first()->setIcon(QIcon(":/XWallpaper2/res/stop.png"));
+	ui.btnStart->setIcon(QIcon(":/XWallpaper2/res/stop.png"));
 }
 
 void XWallpaper2::prev()
@@ -182,32 +195,59 @@ void XWallpaper2::pageLoadFinished(bool bok)
 
 void XWallpaper2::on_btnAddFile_clicked()
 {
-	QString str = QFileDialog::getOpenFileName(this,QString::fromLocal8Bit("Ñ¡ÔñÎÄ¼þ"),"",QString("Html File (*.html)"));
+	QString str = QFileDialog::getOpenFileName(this, QString("é€‰æ‹©æ–‡ä»¶"), "", QString("Html File (*.html)"));
 	if (str.isEmpty())
 	{
 		return;
 	}
 	if (m_PlayList.contains(str))
 	{
-		QMessageBox::information(this, QString("XWallpaper2"), QString::fromLocal8Bit("ÁÐ±íÖÐÒÑ´æÔÚ¸ÃÎÄ¼þ£¡"));
+		QMessageBox::information(this, QString("XWallpaper2"), QString("åˆ—è¡¨ä¸­å·²å­˜åœ¨è¯¥æ–‡ä»¶ï¼"));
 		return;
 	}
 	m_PlayList.append(str);
+	showPlayList();
+	savePlayList();
 }
 
 void XWallpaper2::on_btnAddUrl_clicked()
 {
 	QString str = ui.lineEditURL->text();
-	if (str.isEmpty() )
+	if (str.isEmpty())
 	{
 		return;
 	}
 	if (m_PlayList.contains(str))
 	{
-		QMessageBox::information(this, QString("XWallpaper2"), QString::fromLocal8Bit("ÁÐ±íÖÐÒÑ´æÔÚ¸ÃÎÄ¼þ£¡"));
+		QMessageBox::information(this, QString("XWallpaper2"), QString("åˆ—è¡¨ä¸­å·²å­˜åœ¨è¯¥æ–‡ä»¶ï¼"));
 		return;
 	}
 	m_PlayList.append(str);
+	showPlayList();
+	savePlayList();
+}
+
+void XWallpaper2::on_PlayItem()
+{
+	int index = m_ListItems.indexOf((XPlayListItem*)sender());
+	m_currentIndex = index - 1;
+	next();
+}
+
+void XWallpaper2::on_DeleteItem()
+{
+	int index = m_ListItems.indexOf((XPlayListItem*)sender());
+	m_PlayList.removeAt(index);
+	QBoxLayout* layout = (QBoxLayout*)ui.scrollAreaWidgetContents->layout();
+	layout->removeWidget(m_ListItems[index]);
+	delete m_ListItems[index];
+	m_ListItems.removeAt(index);
+	if (m_currentIndex == index)
+	{
+		m_currentIndex -= 1;
+		next();
+	}
+	savePlayList();
 }
 
 void XWallpaper2::closeEvent(QCloseEvent * event)
@@ -230,17 +270,24 @@ void XWallpaper2::closeEvent(QCloseEvent * event)
 	}
 }
 
+void XWallpaper2::showEvent(QShowEvent * se)
+{
+	loadPlayList();
+	showPlayList();
+}
+
 void XWallpaper2::loadPlayList()
 {
 	m_PlayList.clear();
 	QFile f("./list.xd");
 	if (f.open(QFile::ReadOnly))
 	{
-		QString str = f.readLine();
+		QString str = QString::fromUtf8(f.readLine()).trimmed();
+
 		while (!str.isEmpty())
 		{
 			m_PlayList.append(str);
-			str = f.readLine();
+			str = QString::fromUtf8(f.readLine()).trimmed();
 		}
 		f.close();
 	}
@@ -262,7 +309,27 @@ void XWallpaper2::savePlayList()
 
 void XWallpaper2::showPlayList()
 {
+	QBoxLayout* layout = (QBoxLayout*)ui.scrollAreaWidgetContents->layout();
+	for each (auto var in m_ListItems)
+	{
+		layout->removeWidget((QWidget*)var);
+		disconnect(var);
+		delete var;
+	}
+	m_ListItems.clear();
+	delete layout->takeAt(0);
 
+	for each (auto var in m_PlayList)
+	{
+		XPlayListItem* item = new XPlayListItem(ui.scrollAreaWidgetContents);
+		item->SetData(var);
+		layout->addWidget(item);
+		m_ListItems.append(item);
+		connect(item, &XPlayListItem::playItem, this, &XWallpaper2::on_PlayItem);
+		connect(item, &XPlayListItem::deleteItem, this, &XWallpaper2::on_DeleteItem);
+	}
+	//åˆ›å»ºä¸ªå¼¹ç°§æŠŠå†…å®¹é¡¶ä¸€ä¸‹
+	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 }
 
 void XWallpaper2::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason)

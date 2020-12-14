@@ -2,7 +2,7 @@
 #include <QtWidgets/QApplication>
 #include <qt_windows.h>
 
-//Ã¶¾Ù´°¿Ú»Øµ÷
+//æšä¸¾çª—å£å›è°ƒ
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
 	HWND p = FindWindowEx(hwnd, NULL, L"SHELLDLL_DefView", NULL);
@@ -18,18 +18,18 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 
 HWND findDesktopWnd()
 {
-	//Ê×´Î²éÕÒ±³¾°´°¿Ú£¬
+	//é¦–æ¬¡æŸ¥æ‰¾èƒŒæ™¯çª—å£ï¼Œ
 	HWND wallpaper_hwnd = nullptr;
 	EnumWindows(EnumWindowsProc, (LPARAM)&wallpaper_hwnd);
 	if (wallpaper_hwnd != nullptr)
 	{
 		return wallpaper_hwnd;
 	}
-	//Èç¹ûÃ»ÓĞÕÒµ½£¬³¢ÊÔÏòProgMan·¢ËÍÒÔÏÂÏûÏ¢£¬
-	//µ±´°¿Ú½ÓÊÕµ½Õâ¸öÏûÏ¢Ö®ºó»á´´½¨ÎÒÃÇĞèÒªµÄ´°¿Ú¡£
+	//å¦‚æœæ²¡æœ‰æ‰¾åˆ°ï¼Œå°è¯•å‘ProgManå‘é€ä»¥ä¸‹æ¶ˆæ¯ï¼Œ
+	//å½“çª—å£æ¥æ”¶åˆ°è¿™ä¸ªæ¶ˆæ¯ä¹‹åä¼šåˆ›å»ºæˆ‘ä»¬éœ€è¦çš„çª—å£ã€‚
 	HWND progman = ::FindWindow(L"ProgMan", NULL);
 	SendMessageTimeout(progman, 0x052C, 0, 0, SMTO_NORMAL, 1000, nullptr);
-	//ÔÙ²éÕÒÒ»±é
+	//å†æŸ¥æ‰¾ä¸€é
 	EnumWindows(EnumWindowsProc, (LPARAM)&wallpaper_hwnd);
 	return wallpaper_hwnd;
 
@@ -37,9 +37,9 @@ HWND findDesktopWnd()
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    XWallpaper2 w;
+	QApplication a(argc, argv);
+	XWallpaper2 w;
 	w.setDeskopWnd(findDesktopWnd());
-    w.show();
-    return a.exec();
+	w.show();
+	return a.exec();
 }

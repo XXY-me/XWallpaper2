@@ -10,7 +10,18 @@ class XPlayListItem : public QWidget
 public:
 	XPlayListItem(QWidget *parent = Q_NULLPTR);
 	~XPlayListItem();
-
+	void SetData(QString url);
+signals:
+	void playItem();
+	void deleteItem();
+protected slots:
+	void on_btnSet_clicked();
+protected:
+	void resizeEvent(QResizeEvent* re);
+	void showEvent(QShowEvent*se);
+private:
+	void hasSetting(QString file);
 private:
 	Ui::XPlayListItem ui;
+	QString m_url;
 };

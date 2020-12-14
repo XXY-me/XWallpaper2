@@ -2,5 +2,15 @@
     <qresource prefix="/XWallpaper2">
         <file>res/XWallPaper2.ico</file>
         <file>res/XXY.png</file>
+        <file>res/html.png</file>
+        <file>res/delete.png</file>
+        <file>res/MP4.png</file>
+        <file>res/next.png</file>
+        <file>res/prev.png</file>
+        <file>res/set.png</file>
+        <file>res/start.png</file>
+        <file>res/stop.png</file>
+        <file>res/URL.png</file>
+        <file>res/flush.png</file>
     </qresource>
 </RCC>
