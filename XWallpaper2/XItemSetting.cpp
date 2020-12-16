@@ -160,6 +160,7 @@ void XItemSetting::InitUi()
 				item.defaultValue = obj["default"].toString();
 				//item.value = obj["value"].toString();
 				QString type = obj["type"].toString();
+				
 				if (type == "input")
 				{
 					item.type = CT_input;
@@ -179,6 +180,10 @@ void XItemSetting::InitUi()
 				else if (type =="switch")
 				{
 					item.type = CT_switch;
+				}
+				if (item.type == CT_unknow || item.name.isEmpty())
+				{
+					continue;
 				}
 				//创建控件
 				QGroupBox* grpName = new QGroupBox(ui.scrollAreaWidgetContents);

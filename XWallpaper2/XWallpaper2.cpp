@@ -38,6 +38,8 @@ XWallpaper2::XWallpaper2(QWidget *parent)
 	connect(ui.btnPrev, &QPushButton::clicked, this, &XWallpaper2::prev);
 	connect(ui.btnNext, &QPushButton::clicked, this, &XWallpaper2::next);
 	connect(ui.btnStart, &QPushButton::clicked, this, &XWallpaper2::stop);
+
+	loadPlayList();
 }
 
 void XWallpaper2::setDeskopWnd(HWND h)
@@ -272,7 +274,6 @@ void XWallpaper2::closeEvent(QCloseEvent * event)
 
 void XWallpaper2::showEvent(QShowEvent * se)
 {
-	loadPlayList();
 	showPlayList();
 }
 
