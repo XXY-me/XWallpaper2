@@ -71,7 +71,7 @@ void XWallpaper2::setDeskopWnd(HWND h)
 		SetParent((HWND)m_WebView->winId(), m_DesktopWnd);
 		m_WebView->setFixedSize({ r.right,r.bottom });
 		m_WebView->move(0, 0);
-		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls,true);
+		m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::PrintElementBackgrounds,true);
 		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls,true);
 		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::LocalStorageEnabled,true);
 		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);		
