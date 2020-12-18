@@ -26,9 +26,12 @@ protected slots:
 	void on_btnAddUrl_clicked();
 	void on_PlayItem();
 	void on_DeleteItem();
+	void on_ItemConfigChanged();
+
 protected:
 	void closeEvent(QCloseEvent *event);
 	void showEvent(QShowEvent* se);
+	void timerEvent(QTimerEvent* te);
 private:
 	void loadPlayList();
 	void savePlayList();
@@ -44,4 +47,5 @@ private:
 	QStringList m_PlayList;
 	int m_currentIndex = -1;
 	QList<XPlayListItem*> m_ListItems;
+	QTime m_LastChangeTime;
 };

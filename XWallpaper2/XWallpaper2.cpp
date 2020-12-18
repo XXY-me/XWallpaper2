@@ -2,7 +2,6 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QCloseEvent>
-//#include <QWindow>
 #include <qt_windows.h>
 #include <QLabel>
 #include <QWebEngineSettings>
@@ -10,6 +9,8 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QMenu>
+#include "config.h"
+#include <QWebChannel>
 
 XWallpaper2::XWallpaper2(QWidget *parent)
 	: QMainWindow(parent)
@@ -35,11 +36,14 @@ XWallpaper2::XWallpaper2(QWidget *parent)
 	connect(m_TrayIcon, &QSystemTrayIcon::activated, this, &XWallpaper2::onTrayIconActivated);
 
 	//按钮操作
-	connect(ui.btnPrev, &QPushButton::clicked, this, &XWallpaper2::prev);
-	connect(ui.btnNext, &QPushButton::clicked, this, &XWallpaper2::next);
-	connect(ui.btnStart, &QPushButton::clicked, this, &XWallpaper2::stop);
-
+	connect(ui.btnPrev, &QToolButton::clicked, this, &XWallpaper2::prev);
+	connect(ui.btnNext, &QToolButton::clicked, this, &XWallpaper2::next);
+	connect(ui.btnStart, &QToolButton::clicked, this, &XWallpaper2::stop);
+	connect(ui.btnFlush, &QToolButton::clicked, this, &XWallpaper2::flush);
 	loadPlayList();
+	startTimer(3000);
+	//种个种子
+	srand(QDateTime::currentDateTime().toMSecsSinceEpoch());
 }
 
 void XWallpaper2::setDeskopWnd(HWND h)
@@ -71,18 +75,6 @@ void XWallpaper2::setDeskopWnd(HWND h)
 		SetParent((HWND)m_WebView->winId(), m_DesktopWnd);
 		m_WebView->setFixedSize({ r.right,r.bottom });
 		m_WebView->move(0, 0);
-		m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::PrintElementBackgrounds,true);
-		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls,true);
-		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::LocalStorageEnabled,true);
-		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);		
-		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
-		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::JavascriptCanOpenWindows, true);
-		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::JavascriptCanAccessClipboard, true);
-		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::SpatialNavigationEnabled, true);
-		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::LinksIncludedInFocusChain, true);
-		//m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::AutoLoadImages, true);
-		//m_WebView->setUrl(QUrl::fromLocalFile(QString::fromLocal8Bit("D:/page/cloud1111/纯css3云彩动画效果/index.html")));
-		//m_WebView->show();
 		next();
 	}
 }
@@ -144,6 +136,7 @@ void XWallpaper2::next()
 			m_WebView->load(QUrl::fromLocalFile(str));
 		}
 	}
+	m_LastChangeTime = QTime::currentTime();
 	m_WebView->show();
 	m_TrayMenu->actions().first()->setText(QString("停止"));
 	m_TrayMenu->actions().first()->setIcon(QIcon(":/XWallpaper2/res/stop.png"));
@@ -193,6 +186,30 @@ void XWallpaper2::pageLoadFinished(bool bok)
 	{
 		next();
 	}
+	else
+	{
+		//检查是否有设置json
+		QString url = m_WebView->url().toLocalFile();
+		if (!url.isEmpty())
+		{
+			QString configUrl = url + ITEM_CONF_SUFFIX;
+			QFile f(configUrl);
+			if (!f.exists())
+			{
+				return;
+			}
+			if (f.open(QFile::ReadOnly))
+			{
+				QString configCon;
+				configCon = f.readAll();
+				f.close();
+				configCon.remove(QRegExp("\\s"));
+				configCon.insert(0, "window.XCONFIG = '");			//设置全局变量
+				configCon.append("';XInit();");							//调用初始化函数
+				m_WebView->page()->runJavaScript(configCon);
+			}
+		}
+	}
 }
 
 void XWallpaper2::on_btnAddFile_clicked()
@@ -224,6 +241,7 @@ void XWallpaper2::on_btnAddUrl_clicked()
 		QMessageBox::information(this, QString("XWallpaper2"), QString("列表中已存在该文件！"));
 		return;
 	}
+	ui.lineEditURL->setText("");
 	m_PlayList.append(str);
 	showPlayList();
 	savePlayList();
@@ -252,6 +270,15 @@ void XWallpaper2::on_DeleteItem()
 	savePlayList();
 }
 
+void XWallpaper2::on_ItemConfigChanged()
+{
+	int index = m_ListItems.indexOf((XPlayListItem*)sender());
+	if (index == m_currentIndex)
+	{
+		flush();
+	}
+}
+
 void XWallpaper2::closeEvent(QCloseEvent * event)
 {
 	if (!m_CloseForExit)
@@ -275,6 +302,47 @@ void XWallpaper2::closeEvent(QCloseEvent * event)
 void XWallpaper2::showEvent(QShowEvent * se)
 {
 	showPlayList();
+}
+
+void XWallpaper2::timerEvent(QTimerEvent* te)
+{
+	if (ui.comboBoxLoopType->currentIndex() == 0)
+	{
+		return;
+	}
+	int ns = 0;			//间隔秒数
+	switch (ui.comboBoxChangeTime->currentIndex())
+	{
+	case 0:				//1分钟
+		ns = 60;
+		break;
+	case 1:				//3分钟
+		ns = 180;
+		break;
+	case 2:				//10分钟
+		ns = 600;
+		break;
+	case 3:				//30分钟
+		ns = 1800;
+		break;
+	case 4:				//1小时
+		ns = 3600;
+		break;
+	case 5:				//6小时
+		ns = 21600;
+		break;
+	default:
+		return;
+		break;
+	}
+	if (m_LastChangeTime.secsTo(QTime::currentTime()) > ns)
+	{
+		if (ui.comboBoxLoopType->currentIndex() == 2)
+		{
+			m_currentIndex = rand() % m_PlayList.count() - 1;			//取随机位置
+		}
+		next();
+	}
 }
 
 void XWallpaper2::loadPlayList()
@@ -328,6 +396,7 @@ void XWallpaper2::showPlayList()
 		m_ListItems.append(item);
 		connect(item, &XPlayListItem::playItem, this, &XWallpaper2::on_PlayItem);
 		connect(item, &XPlayListItem::deleteItem, this, &XWallpaper2::on_DeleteItem);
+		connect(item, &XPlayListItem::configChanged, this, &XWallpaper2::on_ItemConfigChanged);
 	}
 	//创建个弹簧把内容顶一下
 	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));

@@ -3,6 +3,7 @@
 #include <QWidget>
 #include "ui_XPlayListItem.h"
 
+
 class XPlayListItem : public QWidget
 {
 	Q_OBJECT
@@ -14,6 +15,7 @@ public:
 signals:
 	void playItem();
 	void deleteItem();
+	void configChanged();
 protected slots:
 	void on_btnSet_clicked();
 protected:

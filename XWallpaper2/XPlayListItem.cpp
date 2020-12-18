@@ -1,6 +1,7 @@
 #include "XPlayListItem.h"
 #include <QFileInfo>
 #include "XItemSetting.h"
+#include "config.h"
 
 XPlayListItem::XPlayListItem(QWidget *parent)
 	: QWidget(parent)
@@ -58,7 +59,7 @@ void XPlayListItem::showEvent(QShowEvent * se)
 
 void XPlayListItem::hasSetting(QString file)
 {
-	QString setFile = file + ".json";
+	QString setFile = file + ITEM_CONF_SUFFIX;
 	if (QFileInfo(setFile).isFile())
 	{
 		ui.btnSet->show();
@@ -67,7 +68,8 @@ void XPlayListItem::hasSetting(QString file)
 
 void XPlayListItem::on_btnSet_clicked()
 {
-	QString configFile = m_url + ".json";
+	QString configFile = m_url + ITEM_CONF_SUFFIX;
 	XItemSetting dlg(configFile,this);
-	dlg.exec();
+	if (dlg.exec())
+		emit configChanged();
 }

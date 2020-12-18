@@ -11,6 +11,8 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QFileDialog>
+#include <QToolButton>
+#include <QColorDialog>
 
 XItemSetting::XItemSetting(QString configFile,QWidget *parent)
 	: QDialog(parent)
@@ -55,24 +57,30 @@ void XItemSetting::on_btnOK_clicked()
 			obj["type"] = "combo";
 		}
 		break;
-		case CT_openFile:
-		{
-			obj["value"] = ((QLineEdit*)var.ctl)->text();
-			obj["type"] = "openFile";
-		}
-		break;
-		case CT_openFolder:
-		{
-			obj["value"] = ((QLineEdit*)var.ctl)->text();
-			obj["type"] = "openFolder";
-		}
-		break;
+		//case CT_openFile:
+		//{
+		//	obj["value"] = ((QLineEdit*)var.ctl)->text();
+		//	obj["type"] = "openFile";
+		//}
+		//break;
+		//case CT_openFolder:
+		//{
+		//	obj["value"] = ((QLineEdit*)var.ctl)->text();
+		//	obj["type"] = "openFolder";
+		//}
+		//break;
 		case CT_switch:
 		{
 			obj["value"] = ((QCheckBox*)var.ctl)->isChecked()?"true":"false";
 			obj["type"] = "switch";
 		}
 		break;
+		case CT_color:
+		{
+			obj["value"] = ((QPushButton*)var.ctl)->text();
+			obj["type"] = "color";
+		}
+			break;
 		default:
 			break;
 		}
@@ -104,16 +112,16 @@ void XItemSetting::on_btnReset_clicked()
 			((QComboBox*)var.ctl)->setCurrentText(var.defaultValue);
 		}
 		break;
-		case CT_openFile:
-		{
-			((QLineEdit*)var.ctl)->setText(var.defaultValue);
-		}
-		break;
-		case CT_openFolder:
-		{
-			((QLineEdit*)var.ctl)->setText(var.defaultValue);
-		}
-		break;
+		//case CT_openFile:
+		//{
+		//	((QLineEdit*)var.ctl)->setText(var.defaultValue);
+		//}
+		//break;
+		//case CT_openFolder:
+		//{
+		//	((QLineEdit*)var.ctl)->setText(var.defaultValue);
+		//}
+		//break;
 		case CT_switch:
 		{
 			if (var.defaultValue =="true")
@@ -125,6 +133,16 @@ void XItemSetting::on_btnReset_clicked()
 			
 		}
 		break;
+		case CT_color:
+		{
+			QColor c;
+			c.setNamedColor(var.defaultValue);
+			QColor crInvert;
+			crInvert.setRgb(255 - c.red(), 255 - c.green(), 255 - c.blue());
+			((QPushButton*)var.ctl)->setStyleSheet(QString("QPushButton{background-color:%1;color:%2;}").arg(c.name()).arg(crInvert.name()));
+			((QPushButton*)var.ctl)->setText(c.name());
+		}
+			break;
 		default:
 			break;
 		}
@@ -169,17 +187,21 @@ void XItemSetting::InitUi()
 				{
 					item.type = CT_combo;
 				}
-				else if (type == "openFile")
-				{
-					item.type = CT_openFile;
-				}
-				else if (type == "openFolder")
-				{
-					item.type = CT_openFolder;
-				}
+				//else if (type == "openFile")
+				//{
+				//	item.type = CT_openFile;
+				//}
+				//else if (type == "openFolder")
+				//{
+				//	item.type = CT_openFolder;
+				//}
 				else if (type =="switch")
 				{
 					item.type = CT_switch;
+				}
+				else if (type == "color")
+				{
+					item.type = CT_color;
 				}
 				if (item.type == CT_unknow || item.name.isEmpty())
 				{
@@ -222,50 +244,50 @@ void XItemSetting::InitUi()
 					item.ctl = cb;
 				}
 					break;
-				case CT_openFile:
-				{
-					QHBoxLayout *layout3 = new QHBoxLayout(grpName);
-					layout2->addLayout(layout3);
-					QLineEdit *lab = new QLineEdit(grpName);
-					lab->setText(obj["value"].toString());
-					//lab->setStyleSheet("QLabel{border:1px solid #c0c0c0;}");
-					layout3->addWidget(lab);
-					QPushButton* btn = new QPushButton(grpName);
-					btn->setText("选择文件");
-					btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-					layout3->addWidget(btn);
-					connect(btn, &QPushButton::clicked, [lab, this]() {
-						QString str = QFileDialog::getOpenFileName(this, "选择文件");
-						if (!str.isEmpty())
-						{
-							lab->setText(str);
-						}
-					});
-					item.ctl = lab;
-				}
-					break;
-				case CT_openFolder:
-				{
-					QHBoxLayout *layout3 = new QHBoxLayout(grpName);
-					layout2->addLayout(layout3);
-					QLineEdit *lab = new QLineEdit(grpName);
-					lab->setText(obj["value"].toString());
-					//lab->setStyleSheet("QLabel{border:1px solid #c0c0c0;}");
-					layout3->addWidget(lab);
-					QPushButton* btn = new QPushButton(grpName);
-					btn->setText("选择文件夹");
-					btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-					layout3->addWidget(btn);
-					connect(btn, &QPushButton::clicked, [lab,this]() {
-						QString str = QFileDialog::getExistingDirectory(this,"选择文件夹");
-						if (!str.isEmpty())
-						{
-							lab->setText(str);
-						}
-					});
-					item.ctl = lab;
-				}
-					break;
+				//case CT_openFile:
+				//{
+				//	QHBoxLayout *layout3 = new QHBoxLayout(grpName);
+				//	layout2->addLayout(layout3);
+				//	QLineEdit *lab = new QLineEdit(grpName);
+				//	lab->setText(obj["value"].toString());
+				//	//lab->setStyleSheet("QLabel{border:1px solid #c0c0c0;}");
+				//	layout3->addWidget(lab);
+				//	QPushButton* btn = new QPushButton(grpName);
+				//	btn->setText("选择文件");
+				//	btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+				//	layout3->addWidget(btn);
+				//	connect(btn, &QPushButton::clicked, [lab, this]() {
+				//		QString str = QFileDialog::getOpenFileName(this, "选择文件");
+				//		if (!str.isEmpty())
+				//		{
+				//			lab->setText(str);
+				//		}
+				//	});
+				//	item.ctl = lab;
+				//}
+				//	break;
+				//case CT_openFolder:
+				//{
+				//	QHBoxLayout *layout3 = new QHBoxLayout(grpName);
+				//	layout2->addLayout(layout3);
+				//	QLineEdit *lab = new QLineEdit(grpName);
+				//	lab->setText(obj["value"].toString());
+				//	//lab->setStyleSheet("QLabel{border:1px solid #c0c0c0;}");
+				//	layout3->addWidget(lab);
+				//	QPushButton* btn = new QPushButton(grpName);
+				//	btn->setText("选择文件夹");
+				//	btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+				//	layout3->addWidget(btn);
+				//	connect(btn, &QPushButton::clicked, [lab,this]() {
+				//		QString str = QFileDialog::getExistingDirectory(this,"选择文件夹");
+				//		if (!str.isEmpty())
+				//		{
+				//			lab->setText(str);
+				//		}
+				//	});
+				//	item.ctl = lab;
+				//}
+				//	break;
 				case CT_switch:
 				{
 					QCheckBox* cb = new QCheckBox(grpName);
@@ -280,6 +302,29 @@ void XItemSetting::InitUi()
 					}
 					layout2->addWidget(cb);
 					item.ctl = cb;
+				}
+					break;
+				case CT_color:
+				{
+					QColor c;
+					c.setNamedColor(obj["value"].toString());
+					QPushButton* btnColor = new QPushButton(grpName);
+					btnColor->setText(obj["value"].toString());
+					QColor crInvert;
+					crInvert.setRgb(255 - c.red(), 255 - c.green(), 255 - c.blue());
+					btnColor->setStyleSheet(QString("QPushButton{background-color:%1;color:%2;}").arg(c.name()).arg(crInvert.name()));
+					layout2->addWidget(btnColor);
+					connect(btnColor, &QPushButton::clicked, [btnColor, this]() {
+						QColor c2 = QColorDialog::getColor();
+						if (c2.isValid())
+						{
+							QColor crInvert;
+							crInvert.setRgb(255 - c2.red(), 255 - c2.green(), 255 - c2.blue());
+							btnColor->setStyleSheet(QString("QPushButton{background-color:%1;color:%2;}").arg(c2.name()).arg(crInvert.name()));
+							btnColor->setText(c2.name());
+						}
+						});
+					item.ctl = btnColor;
 				}
 					break;
 				default:

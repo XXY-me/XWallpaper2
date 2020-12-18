@@ -8,9 +8,10 @@ enum ConfigType
 	CT_unknow,
 	CT_input,
 	CT_combo,
-	CT_openFile,
-	CT_openFolder,
-	CT_switch
+	//CT_openFile,
+	//CT_openFolder,
+	CT_switch,
+	CT_color
 };
 
 struct ConfigItem
