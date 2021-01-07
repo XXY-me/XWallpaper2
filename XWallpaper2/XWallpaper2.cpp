@@ -11,6 +11,9 @@
 #include <QMenu>
 #include "config.h"
 #include <QWebChannel>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
 
 XWallpaper2::XWallpaper2(QWidget *parent)
 	: QMainWindow(parent)
@@ -70,6 +73,7 @@ void XWallpaper2::setDeskopWnd(HWND h)
 
 		//创建WebView窗口用来显示
 		m_WebView = new QWebEngineView();
+		m_WebView->settings()->defaultSettings()->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture, false);
 		connect(m_WebView, &QWebEngineView::loadFinished, this, &XWallpaper2::pageLoadFinished);
 		m_WebView->setWindowFlags(Qt::FramelessWindowHint);
 		SetParent((HWND)m_WebView->winId(), m_DesktopWnd);
@@ -288,6 +292,7 @@ void XWallpaper2::closeEvent(QCloseEvent * event)
 	}
 	else
 	{
+		savePlayList();
 		if (m_WebView)
 		{
 			m_WebView->close();
@@ -348,30 +353,46 @@ void XWallpaper2::timerEvent(QTimerEvent* te)
 void XWallpaper2::loadPlayList()
 {
 	m_PlayList.clear();
+	QByteArray ba;
 	QFile f("./list.xd");
 	if (f.open(QFile::ReadOnly))
 	{
-		QString str = QString::fromUtf8(f.readLine()).trimmed();
-
-		while (!str.isEmpty())
-		{
-			m_PlayList.append(str);
-			str = QString::fromUtf8(f.readLine()).trimmed();
-		}
+		ba = f.readAll();
 		f.close();
+	}
+	QJsonDocument doc;
+	QJsonParseError err;
+	doc = QJsonDocument::fromJson(ba, &err);
+	if (err.error == QJsonParseError::NoError && doc.isObject())
+	{
+		QJsonObject obj = doc.object();
+		m_currentIndex = obj["lastCurrent"].toInt() - 1;
+		QJsonArray ar = obj["list"].toArray();
+		for each (auto var in ar)
+		{
+			m_PlayList.append(var.toString());
+		}
 	}
 }
 
 void XWallpaper2::savePlayList()
 {
+	QJsonObject obj;
+	QJsonArray ar;
+
+	for each (auto var in m_PlayList)
+	{
+		ar.append(var);
+	}
+	obj["list"] = ar;
+	obj["lastCurrent"] = m_currentIndex >= 0 && m_currentIndex < m_PlayList.count() ? m_currentIndex : 0;
+
+	QJsonDocument doc(obj);
+
 	QFile f("./list.xd");
 	if (f.open(QFile::WriteOnly))
 	{
-		for each (auto var in m_PlayList)
-		{
-			f.write(var.toUtf8());
-			f.write("\r\n");
-		}
+		f.write(doc.toJson());
 		f.close();
 	}
 }

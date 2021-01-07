@@ -3,3 +3,15 @@
 
 命令
 -- -webengine-proprietary-codecs
+
+
+./configure -confirm-license -opensource -platform win64-msvc -debug-and-release -prefix "./build" -qt-sqlite -qt-pcre -qt-zlib -qt-libpng -qt-libjpeg -opengl desktop -qt-freetype -nomake tests -no-compile-examples -nomake examples -webengine-proprietary-codecs
+
+
+
+文件
+C:\Qt\5.15.2\Src\qtwebengine\build\src\core\release\obj\third_party\angle\libANGLE.ninja
+C:\Qt\5.15.2\Src\qtwebengine\build\src\core\debug\obj\third_party\angle\angle_common.ninja
+
+删除/we4244
+
